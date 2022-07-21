@@ -1,0 +1,23 @@
+Package: gosling
+Version: 0.0.0.9000
+Title: Interface to 'Gos'
+Description: Interface to 'Gos' <https://github.com/gosling-lang/gos>, which
+  itself is a 'Python' interface to 'Gosling' <https://github.com/gosling-lang/gosling.js/>.
+  This package uses the 'Reticulate' framework <https://rstudio.github.io/reticulate/> 
+  to manage the interface between R and 'Python'.
+Authors@R:
+    person(
+      given = "Trevor",
+      family = "Manz", 
+      email = "trevor_manz@g.harvard.edu",
+      role = c("aut", "cre"),
+      comment = c(ORCID =  "0000-0001-7694-5164" )
+    )
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
+Imports:
+    reticulate (>= 1.23),
+    htmltools,
+    magrittr
