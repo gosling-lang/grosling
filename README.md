@@ -31,83 +31,10 @@ track <- gos$Track(data, height = 100)$mark_point()$encode(
   y = gos$Y("peak:Q")
 )
 
-track$view() %>% goslingwidget()
+view <- track$view()
+
+view
 ```
-
-<!DOCTYPE html>
-<html>
-<head>
-  <style>.error { color: red; }</style>
-  <link rel="stylesheet" href="https://unpkg.com/higlass@1.11/dist/hglib.css">
-</head>
-<body>
-  <div id="jupyter-gosling-caa9fb5f2ee8437dbf314c0ee14e9b20"></div>
-  <script type="module">
-
-    async function loadScript(src) {
-        return new Promise(resolve => {
-            const script = document.createElement('script');
-            script.onload = resolve;
-            script.src = src;
-            script.async = false;
-            document.head.appendChild(script);
-        });
-    }
-
-    async function loadGosling() {
-        // Manually load scripts from window namespace since requirejs might not be
-        // available in all browser environments.
-
-        // https://github.com/DanielHreben/requirejs-toggle
-        if (!window.gosling) {
-
-            // https://github.com/DanielHreben/requirejs-toggle
-            window.__requirejsToggleBackup = {
-                define: window.define,
-                require: window.require,
-                requirejs: window.requirejs,
-            };
-
-            for (const field of Object.keys(window.__requirejsToggleBackup)) {
-                window[field] = undefined;
-            }
-
-            // load dependencies sequentially
-            const sources = [
-                "https://unpkg.com/react@17/umd/react.production.min.js",
-                "https://unpkg.com/react-dom@17/umd/react-dom.production.min.js",
-                "https://unpkg.com/pixi.js@6/dist/browser/pixi.min.js",
-                "https://unpkg.com/higlass@1.11/dist/hglib.js",
-                "https://unpkg.com/gosling.js@0.9.21/dist/gosling.js",
-            ];
-
-            for (const src of sources) await loadScript(src);
-
-            // restore requirejs after scripts have loaded
-            Object.assign(window, window.__requirejsToggleBackup);
-            delete window.__requirejsToggleBackup;
-
-        }
-
-        return window.gosling;
-    };
-
-    var el = document.getElementById('jupyter-gosling-caa9fb5f2ee8437dbf314c0ee14e9b20');
-    var spec = {"tracks": [{"data": {"type": "bigwig", "url": "https://s3.amazonaws.com/gosling-lang.org/data/ExcitatoryNeurons-insertions_bin100_RIPnorm.bw", "column": "position", "value": "peak"}, "height": 100.0, "mark": "point", "width": 800, "x": {"field": "position", "type": "genomic"}, "y": {"field": "peak", "type": "quantitative"}}]};
-    var opt = {"padding": 0, "theme": null};
-
-    loadGosling()
-        .then(gosling => gosling.embed(el, spec, opt))
-        .catch(err => {
-            el.innerHTML = `<div class="error">
-    <p>JavaScript Error: ${error.message}</p>
-    <p>This usually means there's a typo in your Gosling specification. See the javascript console for the full traceback.</p>
-</div>`;
-            throw error;
-        });
-  </script>
-</body>
-</html>
 
 ![Gosling
 visualization](https://user-images.githubusercontent.com/24403730/180341226-a9ac36b4-47cb-40d8-bfd2-a2e6f18c153f.png)

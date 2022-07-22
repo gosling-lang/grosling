@@ -23,7 +23,7 @@ to the [Gos](https://github.com/gosling-lang/gos) Python package.
 
 ## Example
 
-```{r example}
+```{r, eval = FALSE}
 library("gosling")
 
 data <- gos$bigwig(
@@ -37,7 +37,9 @@ track <- gos$Track(data, height = 100)$mark_point()$encode(
   y = gos$Y("peak:Q")
 )
 
-track$view() %>% goslingwidget()
+view <- track$view()
+
+view
 ```
 
 ![Gosling visualization](https://user-images.githubusercontent.com/24403730/180341226-a9ac36b4-47cb-40d8-bfd2-a2e6f18c153f.png)
