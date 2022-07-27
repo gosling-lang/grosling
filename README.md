@@ -18,7 +18,7 @@ package.
 ## Example
 
 ``` r
-library("gosling")
+library(gosling)
 
 data <- gos$bigwig(
   url = "https://s3.amazonaws.com/gosling-lang.org/data/ExcitatoryNeurons-insertions_bin100_RIPnorm.bw",
@@ -31,9 +31,7 @@ track <- gos$Track(data, height = 100)$mark_point()$encode(
   y = gos$Y("peak:Q")
 )
 
-view <- track$view()
-
-view
+track$view()
 ```
 
 ![Gosling
@@ -67,3 +65,47 @@ reticulate::use_condaenv("r-reticulate")
 
 The `use_condaenv()` function is called to provide a hint to reticulate
 on which Python environment to use.
+
+## Local Data
+
+Gos [transparently
+serves](https://gosling-lang.github.io/gos/user_guide/local_data.html)
+local and in-memory datasets for the Gosling client via a background
+data server. This feature is enabled automatically whenever a local file
+path is detected (rather than a URL).
+
+Due to [a temporary limitation with
+`reticulate`](https://github.com/rstudio/reticulate/issues/515#issuecomment-1196609327),
+some additional setup is required to enable this feature in
+**grosling**. Hopefully this will be resolved in `reticulate` soon, but
+the current workaround is shown below.
+
+``` r
+library(gosling)
+
+### Setup reticulate to continually yield R <> Python. You only need to run this *once*.
+local({
+  reticulate::py_run_string("from time import sleep")
+  py_yield_and_register_next_yield <- function() {
+    reticulate::py_eval("sleep(0.001)")
+    later::later(py_yield_and_register_next_yield, .001)
+    invisible()
+  }
+  later::later(py_yield_and_register_next_yield)
+})
+###
+
+file <- "./ExcitatoryNeurons-insertions_bin100_RIPnorm.bw" # local file
+data <- gos$bigwig(file, column = "position", value = "peak")
+
+track <- gos$Track(data, height = 100, width = 750)$mark_bar()$encode(
+  x = gos$X("position:G"),
+  y = gos$Y("peak:Q"),
+  color = gos$Color("peak:Q")
+)
+
+track$view()
+```
+
+![Gosling visualization using local
+file](https://user-images.githubusercontent.com/24403730/181269342-9e8d1246-d227-4850-b1ae-66f747654369.png)
