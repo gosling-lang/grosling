@@ -68,7 +68,7 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"gosling"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">gosling</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">gos</span><span class="op">$</span><span class="fu">bigwig</span><span class="op">(</span></span>
 <span>  url <span class="op">=</span> <span class="st">"https://s3.amazonaws.com/gosling-lang.org/data/ExcitatoryNeurons-insertions_bin100_RIPnorm.bw"</span>,</span>
@@ -81,9 +81,7 @@
 <span>  y <span class="op">=</span> <span class="va">gos</span><span class="op">$</span><span class="fu">Y</span><span class="op">(</span><span class="st">"peak:Q"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">view</span> <span class="op">&lt;-</span> <span class="va">track</span><span class="op">$</span><span class="fu">view</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">view</span></span></code></pre></div>
+<span><span class="va">track</span><span class="op">$</span><span class="fu">view</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="https://user-images.githubusercontent.com/24403730/180341226-a9ac36b4-47cb-40d8-bfd2-a2e6f18c153f.png" alt=""><p class="caption">Gosling visualization</p>
 </div>
@@ -102,6 +100,40 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"r-reticulate"</span><span class="op">)</span></span></code></pre></div>
 <p>The <code>use_condaenv()</code> function is called to provide a hint to reticulate on which Python environment to use.</p>
+</div>
+<div class="section level2">
+<h2 id="local-data">Local Data<a class="anchor" aria-label="anchor" href="#local-data"></a>
+</h2>
+<p>Gos <a href="https://gosling-lang.github.io/gos/user_guide/local_data.html" class="external-link">transparently serves</a> local and in-memory datasets for the Gosling client via a background data server. This feature is enabled automatically whenever a local file path is detected (rather than a URL).</p>
+<p>Due to <a href="https://github.com/rstudio/reticulate/issues/515#issuecomment-1196609327" class="external-link">a temporary limitation with <code>reticulate</code></a>, some additional setup is required to enable this feature in <strong>grosling</strong>. Hopefully this will be resolved in <code>reticulate</code> soon, but the current workaround is shown below.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">gosling</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">### Setup reticulate to continually yield R &lt;&gt; Python. You only need to run this *once*.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>  <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">"from time import sleep"</span><span class="op">)</span></span>
+<span>  <span class="va">py_yield_and_register_next_yield</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_eval.html" class="external-link">py_eval</a></span><span class="op">(</span><span class="st">"sleep(0.001)"</span><span class="op">)</span></span>
+<span>    <span class="fu">later</span><span class="fu">::</span><span class="fu">later</span><span class="op">(</span><span class="va">py_yield_and_register_next_yield</span>, <span class="fl">.001</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu">later</span><span class="fu">::</span><span class="fu">later</span><span class="op">(</span><span class="va">py_yield_and_register_next_yield</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">###</span></span>
+<span></span>
+<span><span class="va">file</span> <span class="op">&lt;-</span> <span class="st">"./ExcitatoryNeurons-insertions_bin100_RIPnorm.bw"</span> <span class="co"># local file</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">gos</span><span class="op">$</span><span class="fu">bigwig</span><span class="op">(</span><span class="va">file</span>, column <span class="op">=</span> <span class="st">"position"</span>, value <span class="op">=</span> <span class="st">"peak"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">track</span> <span class="op">&lt;-</span> <span class="va">gos</span><span class="op">$</span><span class="fu">Track</span><span class="op">(</span><span class="va">data</span>, height <span class="op">=</span> <span class="fl">100</span>, width <span class="op">=</span> <span class="fl">750</span><span class="op">)</span><span class="op">$</span><span class="fu">mark_bar</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">encode</span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">gos</span><span class="op">$</span><span class="fu">X</span><span class="op">(</span><span class="st">"position:G"</span><span class="op">)</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">gos</span><span class="op">$</span><span class="fu">Y</span><span class="op">(</span><span class="st">"peak:Q"</span><span class="op">)</span>,</span>
+<span>  color <span class="op">=</span> <span class="va">gos</span><span class="op">$</span><span class="fu">Color</span><span class="op">(</span><span class="st">"peak:Q"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">track</span><span class="op">$</span><span class="fu">view</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="https://user-images.githubusercontent.com/24403730/181269342-9e8d1246-d227-4850-b1ae-66f747654369.png" alt=""><p class="caption">Gosling visualization using local file</p>
+</div>
 </div>
 </div>
 
